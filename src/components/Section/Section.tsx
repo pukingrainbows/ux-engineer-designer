@@ -48,8 +48,6 @@ export default function Section(props: SectionProps) {
   }
 
   useEffect(() => {
-    console.log("action.activeSection", state.activeSection);
-    console.log("section.id", section.id);
     if (state.activeSection === section.id) {
       setIsSectionActive(true);
       return;
@@ -57,7 +55,7 @@ export default function Section(props: SectionProps) {
     setIsSectionActive(false);
   }, [state.activeSection, section.id]);
 
-  const [hoverBorderCSS] = toRGBA(Colour.interactiveBoxHover, 0.5);
+  const [hoverBorderCSS] = toRGBA(Colour.interactiveBoxHover, 0.3);
 
   const interactiveStatus = isSectionActive
     ? {
@@ -65,30 +63,42 @@ export default function Section(props: SectionProps) {
       }
     : {
         _hover: {
-          border: `1px dashed ${hoverBorderCSS}`
+          boxShadow: `0 0 0 1px dashed ${hoverBorderCSS}`
         }
       };
 
   return (
-    <Box
-      as="button"
-      display="block"
-      width="100%"
-      position="relative"
-      height="240px"
-      data-name="section"
-      data-section-id={section.id}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
-      onClick={handleClick}
-      {...interactiveStatus}
-    >
-      <Box color={Colour.textDefault}>{section.id}</Box>
-      <Box opacity={isSectionActive ? 1 : 0}>
-        <Button onClick={handleInsertAbove} top="-20px" />
-        <Button onClick={handleInsertBelow} bottom="9px" />
+    <Box position="relative" width="100%" height="240px">
+      <Box
+        as="button"
+        display="block"
+        position="absolute"
+        data-name="section"
+        width="100%"
+        height="100%"
+        top="0"
+        data-section-id={section.id}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
+        onClick={handleClick}
+        {...interactiveStatus}
+        zIndex="1"
+      >
+        <Box opacity={isSectionActive ? 1 : 0}>
+          <Button onClick={handleInsertAbove} top="-16px" />
+          <Button onClick={handleInsertBelow} bottom="8px" />
+        </Box>
+      </Box>
+      <Box
+        position="relative"
+        background="white"
+        color={Colour.textDefault}
+        position="relative"
+        height="240px"
+      >
+        {section.id}
       </Box>
     </Box>
   );

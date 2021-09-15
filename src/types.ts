@@ -23,3 +23,12 @@ export interface Layout {
   content: React.ReactElement | Layout;
   type: Layout;
 }
+
+export interface Rect {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  top: number;
+  left: number;
+}

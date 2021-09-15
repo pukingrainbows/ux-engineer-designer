@@ -10,7 +10,7 @@ export default function Chrome(props: { children: React.ReactChildren }) {
       position="relative"
       width="100%"
       heigh="100%"
-      background={Colour.background}
+      background="#E5E5E5"
     >
       <Box data-name="chrome">{children}</Box>
     </Box>

@@ -1,21 +1,20 @@
 import { useState, useEffect } from "react";
 import { Box } from "@chakra-ui/react";
+import { FiGrid } from "react-icons/fi";
+
 import Section from "../Section";
 import { useSeducerWithContext } from "@paprika/seducer";
-import { Section as SectionType, Sections as SectionsType } from "../../types";
+import Toolbar from "../Section/components/Toolbar";
+
+import {
+  Section as SectionType,
+  Sections as SectionsType,
+  Rect
+} from "../../types";
 
 interface SectionsProps {
   sections: SectionsType;
 }
-
-type Rect = {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-  top: number;
-  left: number;
-} | null;
 
 function getRect(element: HTMLButtonElement): Rect {
   const { x, y, width, height, top, left } = element.getBoundingClientRect();
@@ -30,14 +29,14 @@ function getSectionElement(id: string) {
 }
 
 export default function Sections(props: SectionsProps) {
-  const [gridToolPosition, setGridPosition] = useState<Rect>(null);
+  const [rect, setRect] = useState<Rect | null>(null);
   const [state] = useSeducerWithContext();
 
   useEffect(() => {
     function handleScroll() {
       const sectionElement = getSectionElement(state.activeSection);
       if (sectionElement) {
-        setGridPosition(getRect(sectionElement));
+        setRect(getRect(sectionElement));
         return;
       }
     }
@@ -51,23 +50,21 @@ export default function Sections(props: SectionsProps) {
   useEffect(() => {
     const sectionElement = getSectionElement(state.activeSection);
     if (sectionElement) {
-      setGridPosition(getRect(sectionElement));
+      setRect(getRect(sectionElement));
       return;
     }
-    setGridPosition(null);
+    setRect(null);
   }, [state.activeSection]);
 
   return (
     <>
-      {gridToolPosition ? (
-        <Box
-          position="fixed"
-          background="red"
-          top={`${gridToolPosition.y}px`}
-          left={`${gridToolPosition.x}px`}
-          width={gridToolPosition.width}
-          height="24px"
-        ></Box>
+      {rect ? (
+        <Toolbar rect={rect} isActiveSection={Boolean(state.activeSection)}>
+          <Box>Section</Box>
+          <Box>
+            <FiGrid />
+          </Box>
+        </Toolbar>
       ) : null}
       {state.sectionsOrder.map((sectionId: string) => {
         const section: SectionType = state.sections.get(sectionId);
