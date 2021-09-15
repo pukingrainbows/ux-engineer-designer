@@ -1,0 +1,8 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background: #1a212a;
+}
