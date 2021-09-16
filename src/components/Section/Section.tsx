@@ -1,42 +1,29 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Box } from "@chakra-ui/react";
 import { Section as SectionType } from "../../types";
 import Button from "./Button";
 import { useSeducerWithContext } from "@paprika/seducer";
 import { toRGBA, Colour } from "../../designSystem";
+import Widgets from "../../widgets";
 
 interface SectionProps {
   section: SectionType;
 }
 
 export default function Section(props: SectionProps) {
+  const refBox = useRef<HTMLDivElement>(null);
   const { section } = props;
   const [state, dispatch, action] = useSeducerWithContext();
-  const [isHighlighted, setIsHighlighted] = useState<Boolean>(false);
   const [isSectionActive, setIsSectionActive] = useState<Boolean>(false);
 
-  function handleInsertAbove(event: MouseEvent) {
+  function handleInsertAbove(event: React.MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
     dispatch(action.AddSection, { id: section.id, position: "above" });
   }
 
-  function handleInsertBelow(event: MouseEvent) {
+  function handleInsertBelow(event: React.MouseEvent<HTMLButtonElement>) {
     event.stopPropagation();
     dispatch(action.AddSection, { id: section.id, position: "below" });
-  }
-
-  function handleMouseEnter() {
-    setIsHighlighted(true);
-  }
-  function handleMouseLeave() {
-    setIsHighlighted(false);
-  }
-
-  function handleFocus() {
-    setIsHighlighted(true);
-  }
-  function handleBlur() {
-    setIsHighlighted(false);
   }
 
   function handleClick(event: MouseEvent) {
@@ -52,53 +39,69 @@ export default function Section(props: SectionProps) {
       setIsSectionActive(true);
       return;
     }
+
     setIsSectionActive(false);
   }, [state.activeSection, section.id]);
 
-  const [hoverBorderCSS] = toRGBA(Colour.interactiveBoxHover, 0.3);
+  const [hoverBorderCSS] = toRGBA(Colour.interactiveBoxHover, 1);
+  const [, rgb] = toRGBA(Colour.interactiveBoxSelected, 0.4);
+  const [red, green, blue] = rgb as Array<number>;
 
   const interactiveStatus = isSectionActive
     ? {
-        boxShadow: `0 0 0 1px ${Colour.interactiveBoxSelected}`
+        borderRadius: "4px",
+        border: `4px solid rgba(${red},${green},${blue}, .4)`,
+        pointerEvents: "none"
       }
     : {
         _hover: {
-          boxShadow: `0 0 0 1px dashed ${hoverBorderCSS}`
-        }
+          border: `2px dashed ${hoverBorderCSS}`
+        },
+        _focus: { boxShadow: "0 0 0 0", outline: "0" },
+        _focusVisible: {}
       };
 
   return (
-    <Box position="relative" width="100%" height="240px">
+    <Box
+      position="relative"
+      width="100%"
+      height="320px"
+      data-section-id={section.id}
+    >
       <Box
         as="button"
         display="block"
         position="absolute"
         data-name="section"
-        width="100%"
-        height="100%"
-        top="0"
-        data-section-id={section.id}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
+        width={refBox.current ? "" : `calc(100%)`}
+        height={refBox.current ? "" : `calc(100%)`}
+        top="0px"
+        left="0px"
         onClick={handleClick}
         {...interactiveStatus}
-        zIndex="1"
-      >
-        <Box opacity={isSectionActive ? 1 : 0}>
-          <Button onClick={handleInsertAbove} top="-16px" />
-          <Button onClick={handleInsertBelow} bottom="8px" />
-        </Box>
+        zIndex={isSectionActive ? "2" : "1"}
+      ></Box>
+      <Box opacity={isSectionActive ? 1 : 0}>
+        <Button
+          onClick={handleInsertAbove}
+          disabled={!Boolean(isSectionActive)}
+          top="-40px"
+          zIndex="3"
+        />
+        <Button
+          onClick={handleInsertBelow}
+          disabled={!Boolean(isSectionActive)}
+          bottom="-8px"
+          zIndex="3"
+        />
       </Box>
       <Box
         position="relative"
         background="white"
         color={Colour.textDefault}
-        position="relative"
-        height="240px"
+        height="320px"
       >
-        {section.id}
+        <Widgets data={section.children[0]} />
       </Box>
     </Box>
   );

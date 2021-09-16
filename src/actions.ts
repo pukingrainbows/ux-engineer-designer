@@ -1,6 +1,8 @@
 import { Section } from "./types";
 import { nanoid } from "nanoid";
-import { State } from "./types";
+import { State, GridLayout, EmptyBox } from "./types";
+
+export type Seducer = [state: State, dispatch: (action: string, payload: unknown) => State, action:{[key:string]:string}]
 
 type AddSectionPosition = "above" | "below";
 
@@ -10,10 +12,19 @@ export function AddSection(
 ) {
   const { id, position } = payload;
   const nextSections = new Map(state.sections);
+
+  const nextId = nanoid();
+  const empty: EmptyBox = {
+    key: `Empty${nextId}`,
+    type: "empty",
+    children: []
+  };
+
   const nextSection: Section = {
+    activeAction: null,
     width: "100%",
-    content: null,
-    id: nanoid()
+    children: [empty],
+    id: nextId
   };
 
   const currentIndex = state.sectionsOrder.indexOf(id);
@@ -48,4 +59,21 @@ export function activeSection(state: State, payload: string) {
     ...state,
     activeSection: payload
   };
+}
+
+export function setGridLayoutForSection(
+  state: State,
+  payload: { id: string; gridLayout: GridLayout }
+) {
+  const { id, gridLayout } = payload;
+
+  const nextSections = new Map(state.sections);
+  const section = nextSections.get(id);
+
+  if (section) {
+    section.activeAction = "gridLayout";
+    section.children = [gridLayout];
+  }
+
+  return { ...state, sections: nextSections };
 }

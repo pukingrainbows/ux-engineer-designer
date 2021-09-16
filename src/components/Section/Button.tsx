@@ -2,11 +2,11 @@ import { ColorModeContext } from "@chakra-ui/react";
 import { Box, BoxProps } from "@chakra-ui/react";
 import { FiPlus } from "react-icons/fi";
 import { Colour } from "../../designSystem";
+import { HTMLChakraProps } from "@chakra-ui/system";
 
-interface ButtonProps
-  extends React.Component<React.HTMLProps<HTMLButtonElement>, {}> {
-  top: string;
-  bottom: string;
+interface ButtonProps extends HTMLChakraProps<"button"> {
+  top?: string;
+  bottom?: string;
 }
 
 export default function Button(props: ButtonProps) {
